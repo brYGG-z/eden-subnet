@@ -127,18 +127,21 @@ def get_ss58_address(name):
         logger.error(f"Error procesing thing:\n{e}")
         return None
 
-def register(module_path, wan_ip, port, NumModules, Netuid):
+def register(module_path, wan_ip, wan_ip_2, port, NumModules, Netuid, source_key, temp_stake, stake):
 
+    ip = wan_ip
 
     for i in range(NumModules):
-        key = "module"
+        if i == 10:
+            ip = wan_ip_2
+        key = source_key
         module_name = f"{module_path}_{i}"
         next_port = port + i
         ss58 = Ss58Address(module_name)
         print("Port: ", next_port)
         print("Transfer Com to new miner key")
         try:
-            value = subprocess.run(["comx", "balance", "transfer", key, "305", ss58], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            value = subprocess.run(["comx", "balance", "transfer", key, temp_stake, ss58], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(value.stdout)
         except Exception as e:
             logger.error(f"Error processing thing:\n{e}")
@@ -146,17 +149,17 @@ def register(module_path, wan_ip, port, NumModules, Netuid):
 
         print("Register new miner key")
         try:
-            value = subprocess.run(["comx", "module", "register", "--ip", wan_ip, "--port", f"{next_port}", "--stake", "300", module_name, module_name, "--netuid", f"{Netuid}"], check=True)
+            value = subprocess.run(["comx", "module", "register", "--ip", ip, "--port", f"{next_port}", "--stake", "300", module_name, module_name, "--netuid", f"{Netuid}"], check=True)
         except subprocess.CalledProcessError as e:
             logger.error(f"Error registering miner, {e}")
         except Exception as e:
             logger.error(f"Error processing thing:\n{e}")        
-        print(f"Registered {module_name} at {wan_ip}:{next_port}")
+        print(f"Registered {module_name} at {ip}:{next_port}")
         sleep(10)
 
         print("Remove Temp Stake from new miner")
         try:
-            value = subprocess.run(["comx", "balance", "unstake",  module_name, "250", ss58, "--netuid", f"{Netuid}"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            value = subprocess.run(["comx", "balance", "unstake",  module_name, temp_stake - stake, module_name, "--netuid", f"{Netuid}"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(value.stdout)
         except Exception as e:
             logger.error(f"Error processing thing:\n{e}")            
@@ -165,36 +168,52 @@ def register(module_path, wan_ip, port, NumModules, Netuid):
 
         print("Send fund back from new miner")
         try:
-            value = subprocess.run(["comx", "balance", "transfer",  module_name, "250", ss58], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            value = subprocess.run(["comx", "balance", "transfer",  module_name, temp_stake - stake - 0.5, source_key], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(value.stdout)
         except Exception as e:
             logger.error(f"Error processing thing:\n{e}")
-        print(f"Funds send")
+        print(f"{temp_stake - stake - 0.5}COM returned to {source_key}")
         sleep(10)
 
-        #print("Test call miner")
-        # c call model.openrouter::cool2/generate hey
-        #subprocess.run(["c", "call", module_name+"/generate", "hey"])
-        #sleep(5)
 
         # Wait before repeating the registration process
         print("Register loop: f{i}")
         sleep(60)
 
 
-
 if __name__ == "__main__":
-    source_miner="eden_subnet/miner/miner.py"
-    source_validator="eden_subnet/validator/validator.py"
-    module_path="z90.studio"
-    source_module=source_miner
-    wan_ip="199.126.197.240"
-    port=26400
-    NumModules=10
-    Netuid=10
+    source_miner = "eden_subnet/miner/miner.py"
+    source_validator = "eden_subnet/validator/validator.py"
+    module_path = input("Enter module path: ")
+    wan_ip = input("Enter WAN IP: ")
+    wan_ip_2 = input("Enter 2nd WAN IP: ")
+    source_key = input("Enter source key: ")
+    temp_stake = input("Enter temp stake: ")
+    stake = input("Enter stake: ")
+    source_module = source_miner
+    port = 50180
+    NumModules = 20
+    Netuid = 10
 
-    serve_modules(module_path=module_path,source_module=source_miner,port=port, NumModules=NumModules, Netuid=Netuid)
-    register(module_path=module_path,wan_ip=wan_ip,port=port, NumModules=NumModules, Netuid=Netuid)
+    serve_modules(
+        module_path=module_path,
+        source_module=source_module,
+        port=port,
+        NumModules=NumModules,
+        Netuid=Netuid
+    )
+
+    register(
+        module_path=module_path,
+        wan_ip=wan_ip,
+        wan_ip_2=wan_ip_2,
+        port=port,
+        NumModules=NumModules,
+        Netuid=Netuid,
+        source_key=source_key,
+        temp_stake=temp_stake,
+        stake=stake
+    )
 
 
     
