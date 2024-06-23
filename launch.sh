@@ -229,7 +229,7 @@ transfer_balance() {
 # Function to serve a miner
 serve_miner() {
     echo "Serving Miner"
-    pm2 start "python -m eden_subnet.miner.$filename --key_name $key_name --host $host --port $port" --name "$module_path"
+    pm2 start "python -m eden_subnet.miner.$filename --key_name $key_name --host 0.0.0.0 --port $port" --name "$module_path"
     echo "Miner served."
 }
 
