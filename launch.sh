@@ -250,7 +250,7 @@ unstake_and_transfer_balance() {
     fi
 
     amount_minus_half=$(echo "$amount - 0.5" | awk '{print $1 - 0.5}')
-    comx balance unstake --netuid "$subnet" "$key_from" "$amount_minus_half" "$key_to"
+    comx balance unstake --netuid "$subnet" "$key_from" "$amount" "$key_to"
     echo "$amount_minus_half COM unstaked from $key_from to $key_to"
 
     echo "Initiating Balance Transfer"
