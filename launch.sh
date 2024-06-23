@@ -7,6 +7,7 @@ set -e
 source_miner="eden_subnet/miner/eden.py"
 source_validator="eden_subnet/validator/eden.py"
 
+
 # Configures the module launch
 configure_launch() {
     # Enter the path of the module
@@ -226,6 +227,75 @@ transfer_balance() {
     echo "Transfer of $amount from $key_from to $key_to initiated."
 }
 
+# Function to unstake balance from a module
+unstake_and_transfer_balance() {
+    local key_from="${1:-}"
+    local key_to="${2:-}"
+    local key_to_transfer="${3:-}"
+    local subnet="${4:-}"
+    local amount="${5:-}"
+
+    if [ -z "$key_from" ] || [ -z "$key_to" ] || [ -z "$key_to_transfer" ] || [ -z "$subnet" ] || [ -z "$amount" ]; then
+        echo "Initiating Balance Unstake"
+        # shellcheck disable=SC2162
+        read -p "Unstake from: " key_from
+        # shellcheck disable=SC2162
+        read -p "Unstake to: " key_to
+        # shellcheck disable=SC2162
+        read -p "Transfer to: " key_to_transfer
+        # shellcheck disable=SC2162
+        read -p "Subnet: " subnet
+        # shellcheck disable=SC2162
+        read -p "Amount to unstake: " amount
+    fi
+
+    comx balance unstake --netuid "$subnet" "$key_from" "$amount" "$key_to"
+    echo "$amount COM unstaked from $key_from to $key_to"
+
+    echo "Initiating Balance Transfer"
+    comx balance transfer "$key_to" "$amount" "$key_to_transfer"
+    echo "Transfer of $amount from $key_to to $key_to_transfer initiated."
+}
+
+# Function to unstake and transfer balance of multiple modules
+unstake_and_transfer_balance_multiple() {
+    declare -a module_names=()
+
+    # Ask the user for the amount
+    # shellcheck disable=SC2162
+    read -p "Amount to unstake from each miner: " amount
+
+    echo "Enter module names ('.' to stop entering module names):"
+    while true; do
+        read -p "Module name: " module_name
+        if [[ $module_name == "." ]]; then
+            break
+        fi
+        module_names+=("$module_name")
+    done
+
+    # Ask the user for the subnet
+    # shellcheck disable=SC2162
+    read -p "Subnet: " subnet
+
+    # Ask the user for the key to transfer the balance to
+    # shellcheck disable=SC2162
+    read -p "Key to transfer balance to: " key_to_transfer
+
+    # Now the module_names array contains the names of the modules entered by the user
+    echo "Module names entered: ${module_names[@]}"
+
+    # Now the amounts array contains the amounts entered by the user
+    echo "Amounts entered: ${amounts[@]}"
+
+    # You can now use the module_names and amounts arrays to perform the unstake and transfer balance operations for each module
+    for i in "${!module_names[@]}"; do
+        module_name="${module_names[i]}"
+        echo "Processing module: $module_name"
+        unstake_and_transfer_balance "$module_name" "$module_name" "$key_to_transfer" "$subnet" "$amount"
+    done
+}
+
 # Function to serve a miner
 serve_miner() {
     echo "Serving Miner"
@@ -308,7 +378,9 @@ echo "6. Serve Validator"
 echo "7. Serve Miner"
 echo "8. Update Module - either validator or miner"
 echo "9. Transfer Balance"
-echo "10. Create Key"
+echo "10. Unstake and Transfer Balance - 1 miner"
+echo "11. Unstake and Transfer Balance - multiple miners"
+echo "12. Create Key"
 # shellcheck disable=SC2162
 read -p "Choose an action " choice
 echo ""
@@ -383,6 +455,12 @@ case "$choice" in
     transfer_balance
     ;;
 10)
+    unstake_and_transfer_balance
+    ;;
+11)
+    unstake_and_transfer_balance_multiple
+    ;;
+12)
     create_key
     ;;
 *)
