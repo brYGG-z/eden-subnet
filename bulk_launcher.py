@@ -149,7 +149,7 @@ def register(module_path, wan_ip, wan_ip_2, port, NumModules, Netuid, source_key
 
         print("Register new miner key")
         try:
-            value = subprocess.run(["comx", "module", "register", "--ip", ip, "--port", f"{next_port}", "--stake", "300", module_name, module_name, "--netuid", f"{Netuid}"], check=True)
+            value = subprocess.run(["comx", "module", "register", "--ip", ip, "--port", f"{next_port}", "--stake", str(float(temp_stake) - 0.5), module_name, module_name, "--netuid", f"{Netuid}"], check=True)
         except subprocess.CalledProcessError as e:
             logger.error(f"Error registering miner, {e}")
         except Exception as e:
@@ -159,7 +159,7 @@ def register(module_path, wan_ip, wan_ip_2, port, NumModules, Netuid, source_key
 
         print("Remove Temp Stake from new miner")
         try:
-            value = subprocess.run(["comx", "balance", "unstake",  module_name, temp_stake - stake, module_name, "--netuid", f"{Netuid}"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            value = subprocess.run(["comx", "balance", "unstake",  module_name, str(float(temp_stake) - float(stake)), module_name, "--netuid", f"{Netuid}"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(value.stdout)
         except Exception as e:
             logger.error(f"Error processing thing:\n{e}")            
@@ -168,11 +168,11 @@ def register(module_path, wan_ip, wan_ip_2, port, NumModules, Netuid, source_key
 
         print("Send fund back from new miner")
         try:
-            value = subprocess.run(["comx", "balance", "transfer",  module_name, temp_stake - stake - 0.5, source_key], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            value = subprocess.run(["comx", "balance", "transfer",  module_name, str(float(temp_stake) - float(stake) - 0.5), source_key], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(value.stdout)
         except Exception as e:
             logger.error(f"Error processing thing:\n{e}")
-        print(f"{temp_stake - stake - 0.5}COM returned to {source_key}")
+        print(f"{str(float(temp_stake) - float(stake) - 0.5)}COM returned to {source_key}")
         sleep(10)
 
 
@@ -195,13 +195,7 @@ if __name__ == "__main__":
     NumModules = 20
     Netuid = 10
 
-    serve_modules(
-        module_path=module_path,
-        source_module=source_module,
-        port=port,
-        NumModules=NumModules,
-        Netuid=Netuid
-    )
+
 
     register(
         module_path=module_path,
