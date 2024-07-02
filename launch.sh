@@ -297,6 +297,45 @@ unstake_and_transfer_balance_multiple() {
     done
 }
 
+# Function to transfer and stake balance of multiple modules from one key
+transfer_and_stake_multiple() {
+    declare -a module_names=()
+
+    # Ask the user for the amount
+    # shellcheck disable=SC2162
+    read -p "Amount to stake to each miner: " amount
+
+    echo "Enter module names ('.' to stop entering module names):"
+    while true; do
+        read -p "Module name: " module_name
+        if [[ $module_name == "." ]]; then
+            break
+        fi
+        module_names+=("$module_name")
+    done
+
+    # Ask the user for the subnet
+    # shellcheck disable=SC2162
+    read -p "Subnet: " subnet
+
+    # Ask the user for the key to transfer the balance to
+    # shellcheck disable=SC2162
+    read -p "Key to transfer balance from: " key_from
+
+
+    # transfer balance and stake to each miner
+    for i in "${!module_names[@]}"; do
+        key_to="${module_names[i]}"
+    echo "Initiating Balance Transfer"
+    comx balance transfer "$key_from" "$amount" "$key_to"
+    echo "Transfer of $amount from $key_from to $key_to completed."
+    mount_minus_half=$(echo "$amount - 0.5" | awk '{print $1 - 0.5}')
+    comx balance stake --netuid "$subnet" "$key_to" "$mount_minus_half" "$key_to"
+    echo "$amount_minus_half COM staked from $key_to to $key_to"
+        
+    done
+}
+
 # Function to serve a miner
 serve_miner() {
     echo "Serving Miner"
@@ -381,7 +420,8 @@ echo "8. Update Module - either validator or miner"
 echo "9. Transfer Balance"
 echo "10. Unstake and Transfer Balance - 1 miner"
 echo "11. Unstake and Transfer Balance - multiple miners"
-echo "12. Create Key"
+echo "12. Transfer and Stake - multiple miners"
+echo "13. Create Key"
 # shellcheck disable=SC2162
 read -p "Choose an action " choice
 echo ""
@@ -462,6 +502,9 @@ case "$choice" in
     unstake_and_transfer_balance_multiple
     ;;
 12)
+    transfer_and_stake_multiple
+    ;;
+13)
     create_key
     ;;
 *)
