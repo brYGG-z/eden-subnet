@@ -141,7 +141,7 @@ def register(module_path, wan_ip, wan_ip_2, port, NumModules, Netuid, source_key
         print("Port: ", next_port)
         print("Transfer Com to new miner key")
         try:
-            value = subprocess.run(["comx", "balance", "transfer", key, temp_stake, ss58], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            value = subprocess.run(["comx", "balance", "transfer", key, stake, ss58], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(value.stdout)
         except Exception as e:
             logger.error(f"Error processing thing:\n{e}")
@@ -149,7 +149,7 @@ def register(module_path, wan_ip, wan_ip_2, port, NumModules, Netuid, source_key
 
         print("Register new miner key")
         try:
-            value = subprocess.run(["comx", "module", "register", "--ip", ip, "--port", f"{next_port}", "--stake", str(float(temp_stake) - 0.5), module_name, module_name, "--netuid", f"{Netuid}"], check=True)
+            value = subprocess.run(["comx", "module", "register", "--ip", ip, "--port", f"{next_port}", "--stake", str(float(stake) - 0.5), module_name, module_name, "--netuid", f"{Netuid}"], check=True)
         except subprocess.CalledProcessError as e:
             logger.error(f"Error registering miner, {e}")
         except Exception as e:
@@ -157,28 +157,28 @@ def register(module_path, wan_ip, wan_ip_2, port, NumModules, Netuid, source_key
         print(f"Registered {module_name} at {ip}:{next_port}")
         sleep(10)
 
-        print("Remove Temp Stake from new miner")
-        try:
-            value = subprocess.run(["comx", "balance", "unstake",  module_name, str(float(temp_stake) - float(stake)), module_name, "--netuid", f"{Netuid}"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(value.stdout)
-        except Exception as e:
-            logger.error(f"Error processing thing:\n{e}")            
-        print(f"Stake Removed")
-        sleep(10)
+        #print("Remove Temp Stake from new miner")
+        #try:
+            #value = subprocess.run(["comx", "balance", "unstake",  module_name, str(float(temp_stake) - float(stake)), module_name, "--netuid", f"{Netuid}"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            #print(value.stdout)
+        #except Exception as e:
+            #logger.error(f"Error processing thing:\n{e}")            
+        #print(f"Stake Removed")
+        #sleep(10)
 
-        print("Send fund back from new miner")
-        try:
-            value = subprocess.run(["comx", "balance", "transfer",  module_name, str(float(temp_stake) - float(stake) - 0.5), source_key], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(value.stdout)
-        except Exception as e:
-            logger.error(f"Error processing thing:\n{e}")
-        print(f"{str(float(temp_stake) - float(stake) - 0.5)}COM returned to {source_key}")
-        sleep(10)
+        #print("Send fund back from new miner")
+        #try:
+            #value = subprocess.run(["comx", "balance", "transfer",  module_name, str(float(temp_stake) - float(stake) - 0.5), source_key], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            #print(value.stdout)
+        #except Exception as e:
+            #logger.error(f"Error processing thing:\n{e}")
+        #print(f"{str(float(temp_stake) - float(stake) - 0.5)}COM returned to {source_key}")
+        #sleep(10)
 
 
         # Wait before repeating the registration process
         print("Register loop: f{i}")
-        sleep(60)
+        sleep(10)
 
 
 if __name__ == "__main__":
@@ -191,12 +191,12 @@ if __name__ == "__main__":
     temp_stake = input("Enter temp stake: ")
     stake = input("Enter stake: ")
     source_module = source_miner
-    port = 50180
-    NumModules = 20
+    port = 50178
+    NumModules = 10
     Netuid = 10
 
 
-
+    serve_modules(module_path=module_path,source_module=source_miner,port=port, NumModules=NumModules, Netuid=Netuid)
     register(
         module_path=module_path,
         wan_ip=wan_ip,
