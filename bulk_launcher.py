@@ -14,6 +14,7 @@ from loguru import logger
 # Set the environment variable
 os.environ['COMX_YES_TO_ALL'] = 'true'
 os.environ['COMX_OUTPUT_JSON'] = 'true'
+os.environ["DO_API_TOKEN"] = 'ENTER YOUR DIGITALOCEAN API TOKEN HERE'
 
 
 # Function to validate the module path
