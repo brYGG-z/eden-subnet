@@ -35,6 +35,28 @@ configuration = miner_settings
 
 
 # Create new class names to let the miners have unique names.
+class Miner_0(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
 class Miner_1(Miner):
     def __init__(self, settings: MinerSettings) -> None:
         """
@@ -232,8 +254,229 @@ class Miner_9(Miner):
             call_timeout=60,
         )
 
+
+class Miner_10(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_11(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_12(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_13(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_14(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_15(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_16(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_17(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_18(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
+
+class Miner_19(Miner):
+    def __init__(self, settings: MinerSettings) -> None:
+        """
+        Initializes the MinerSettings with the provided settings.
+
+        Args:
+            settings (MinerSettings): The settings object containing key_name, module_path, host, port, and ss58_address.
+
+        Returns:
+            None
+        """
+        super().__init__(
+            key_name=settings.key_name,
+            module_path=settings.module_path,
+            host=settings.host,
+            port=settings.port,
+            ss58_address=settings.get_ss58_address(settings.key_name),
+            use_testnet=False,
+            call_timeout=60,
+        )
+
 # Map the classes to the their names so you can call them with a string.
 miner_map = {
+    "Miner_0": Miner_0,
     "Miner_1": Miner_1,
     "Miner_2": Miner_2,
     "Miner_3": Miner_3,
@@ -243,6 +486,16 @@ miner_map = {
     "Miner_7": Miner_7,
     "Miner_8": Miner_8,
     "Miner_9": Miner_9,
+    "Miner_10": Miner_10,
+    "Miner_11": Miner_11,
+    "Miner_12": Miner_12,
+    "Miner_13": Miner_13,
+    "Miner_14": Miner_14,
+    "Miner_15": Miner_15,
+    "Miner_16": Miner_16,
+    "Miner_17": Miner_17,
+    "Miner_18": Miner_18,
+    "Miner_19": Miner_19,
 }
 
 # Instantiate the selected map miner and serve.
