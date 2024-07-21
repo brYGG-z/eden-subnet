@@ -4,6 +4,9 @@
 
 set -e
 
+# Set the environment variable
+export COMX_YES_TO_ALL=true
+
 source_miner="eden_subnet/miner/eden.py"
 source_validator="eden_subnet/validator/eden.py"
 
@@ -258,22 +261,40 @@ unstake_and_transfer_balance() {
     echo "Transfer of $amount_minus_half from $key_to to $key_to_transfer initiated."
 }
 
+# Function to unstake and transfer balance of all modules
+unstake_and_transfer_balance_all() {
+  echo "Unstaking and transferring balance of all modules..."
+
+  # Get the module names of all modules in the .commune/key directory
+  modulenames=$(find $HOME/.commune/key -type f -name "*_*" -exec basename {} \; | sed 's/\.[^.]*$//' | tr '\n' ' ')
+
+  # Store the module names in an array
+  IFS=' ' read -r -a modulenames_array <<< "$modulenames"
+
+  unstake_and_transfer_balance_multiple "${modulenames_array[@]}"
+}
+
 # Function to unstake and transfer balance of multiple modules
 unstake_and_transfer_balance_multiple() {
     declare -a module_names=()
 
+    # Check if any module names are passed as arguments
+    if [[ $# -gt 0 ]]; then
+        module_names=("$@")
+    else
+        echo "Enter module names ('.' to stop entering module names):"
+        while true; do
+            read -p "Module name: " module_name
+            if [[ $module_name == "." ]]; then
+                break
+            fi
+            module_names+=("$module_name")
+        done
+    fi
+
     # Ask the user for the amount
     # shellcheck disable=SC2162
     read -p "Amount to unstake from each miner: " amount
-
-    echo "Enter module names ('.' to stop entering module names):"
-    while true; do
-        read -p "Module name: " module_name
-        if [[ $module_name == "." ]]; then
-            break
-        fi
-        module_names+=("$module_name")
-    done
 
     # Ask the user for the subnet
     # shellcheck disable=SC2162
@@ -287,11 +308,10 @@ unstake_and_transfer_balance_multiple() {
     echo "Module names entered: ${module_names[@]}"
 
     # Now the amounts array contains the amounts entered by the user
-    echo "Amounts entered: ${amounts[@]}"
+    echo "Amount to unstake and transfer: $amount"
 
     # You can now use the module_names and amounts arrays to perform the unstake and transfer balance operations for each module
-    for i in "${!module_names[@]}"; do
-        module_name="${module_names[i]}"
+    for module_name in "${module_names[@]}"; do
         echo "Processing module: $module_name"
         unstake_and_transfer_balance "$module_name" "$module_name" "$key_to_transfer" "$subnet" "$amount"
     done
@@ -420,8 +440,9 @@ echo "8. Update Module - either validator or miner"
 echo "9. Transfer Balance"
 echo "10. Unstake and Transfer Balance - 1 miner"
 echo "11. Unstake and Transfer Balance - multiple miners"
-echo "12. Transfer and Stake - multiple miners"
-echo "13. Create Key"
+echo "12. Unstake and Transfer Balance - ALL miners"
+echo "13. Transfer and Stake - multiple miners"
+echo "14. Create Key"
 # shellcheck disable=SC2162
 read -p "Choose an action " choice
 echo ""
@@ -502,9 +523,12 @@ case "$choice" in
     unstake_and_transfer_balance_multiple
     ;;
 12)
-    transfer_and_stake_multiple
+    unstake_and_transfer_balance_all
     ;;
 13)
+    transfer_and_stake_multiple
+    ;;
+14)
     create_key
     ;;
 *)
@@ -513,4 +537,4 @@ case "$choice" in
     ;;
 esac
 
-echo "Deployment complete."
+echo "Action complete."
