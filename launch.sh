@@ -247,14 +247,12 @@ unstake_and_transfer_balance() {
         # shellcheck disable=SC2162
         read -p "Transfer to: " key_to_transfer
         # shellcheck disable=SC2162
-        read -p "Subnet: " subnet
-        # shellcheck disable=SC2162
         read -p "Amount to unstake: " amount
     fi
 
     amount_minus_half=$(echo "$amount - 0.5" | awk '{print $1 - 0.5}')
-    comx balance unstake --netuid "$subnet" "$key_from" "$amount" "$key_to"
-    echo "$amount_minus_half COM unstaked from $key_from to $key_to"
+    comx balance unstake "$key_from" "$amount" "$key_to"
+    echo "$amount COM unstaked from $key_from to $key_to"
 
     echo "Initiating Balance Transfer"
     comx balance transfer "$key_to" "$amount_minus_half" "$key_to_transfer"
@@ -269,6 +267,31 @@ unstake_and_transfer_balance_all() {
   modulenames=$(find $HOME/.commune/key -type f -name "*_*" -exec basename {} \; | sed 's/\.[^.]*$//' | tr '\n' ' ')
 
   # Store the module names in an array
+  IFS=' ' read -r -a modulenames_array <<< "$modulenames"
+
+  unstake_and_transfer_balance_multiple "${modulenames_array[@]}"
+}
+
+# Function to unstake and transfer balance of all modules
+unstake_and_transfer_balance_name() {
+
+  declare -a module_names=()
+
+  echo "Enter module names ('.' to stop entering module names):"
+  while true; do
+      read -p "Module name: " module_name
+      if [[ $module_name == "." ]]; then
+          break
+      fi
+      module_names+=("$module_name")
+  done
+
+  # Get the module names of all modules in the .commune/key directory that match the provided module names
+  modulenames=$(find $HOME/.commune/key -type f -name "*_*" -print0 | 
+    xargs -0 basename -a | 
+    sed 's/\.[^.]*$//' | 
+    grep -E "$(IFS="|"; echo "${module_names[*]}")" | 
+    tr '\n' ' ')  # Store the module names in an array
   IFS=' ' read -r -a modulenames_array <<< "$modulenames"
 
   unstake_and_transfer_balance_multiple "${modulenames_array[@]}"
@@ -296,10 +319,6 @@ unstake_and_transfer_balance_multiple() {
     # shellcheck disable=SC2162
     read -p "Amount to unstake from each miner: " amount
 
-    # Ask the user for the subnet
-    # shellcheck disable=SC2162
-    read -p "Subnet: " subnet
-
     # Ask the user for the key to transfer the balance to
     # shellcheck disable=SC2162
     read -p "Key to transfer balance to: " key_to_transfer
@@ -315,6 +334,9 @@ unstake_and_transfer_balance_multiple() {
         echo "Processing module: $module_name"
         unstake_and_transfer_balance "$module_name" "$module_name" "$key_to_transfer" "$subnet" "$amount"
     done
+
+    # Print the total amount of balance transferred - amount * number of modules
+    echo "Successfully transferred: $(echo "$amount * ${#module_names[@]}" | bc -l) to $key_to_transfer"
 }
 
 # Function to transfer and stake balance of multiple modules from one key
@@ -334,9 +356,6 @@ transfer_and_stake_multiple() {
         module_names+=("$module_name")
     done
 
-    # Ask the user for the subnet
-    # shellcheck disable=SC2162
-    read -p "Subnet: " subnet
 
     # Ask the user for the key to transfer the balance to
     # shellcheck disable=SC2162
@@ -350,7 +369,7 @@ transfer_and_stake_multiple() {
     comx balance transfer "$key_from" "$amount" "$key_to"
     echo "Transfer of $amount from $key_from to $key_to completed."
     mount_minus_half=$(echo "$amount - 0.5" | awk '{print $1 - 0.5}')
-    comx balance stake --netuid "$subnet" "$key_to" "$mount_minus_half" "$key_to"
+    comx balance stake "$key_to" "$mount_minus_half" "$key_to"
     echo "$amount_minus_half COM staked from $key_to to $key_to"
         
     done
@@ -439,10 +458,11 @@ echo "7. Serve Miner"
 echo "8. Update Module - either validator or miner"
 echo "9. Transfer Balance"
 echo "10. Unstake and Transfer Balance - 1 miner"
-echo "11. Unstake and Transfer Balance - multiple miners"
+echo "11. Unstake and Transfer Balance - specific miners"
 echo "12. Unstake and Transfer Balance - ALL miners"
-echo "13. Transfer and Stake - multiple miners"
-echo "14. Create Key"
+echo "13. Unstake and Transfer Balance - ALL miners by name"
+echo "14. Transfer and Stake - multiple miners"
+echo "15. Create Key"
 # shellcheck disable=SC2162
 read -p "Choose an action " choice
 echo ""
@@ -526,9 +546,12 @@ case "$choice" in
     unstake_and_transfer_balance_all
     ;;
 13)
-    transfer_and_stake_multiple
+    unstake_and_transfer_balance_name
     ;;
 14)
+    transfer_and_stake_multiple
+    ;;
+15)
     create_key
     ;;
 *)
