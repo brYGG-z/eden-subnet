@@ -6,7 +6,7 @@ import digitalocean
 import paramiko
 import ipaddress
 
-os.environ["DO_API_TOKEN"] = 'PUT YOUR DIGITALOCEAN API TOKEN HERE'
+os.environ["DO_API_TOKEN"] = 'ENTER YOUR DIGITALOCEAN API TOKEN HERE'
 
 class NginxRedirectSetup:
     def __init__(self):
@@ -73,17 +73,14 @@ class NginxRedirectSetup:
         for i, key in enumerate(keys):
             print(f"{i+1}. {key.name}")
         
-        print(f"{len(keys)+1}. Use all existing keys")
-        print(f"{len(keys)+2}. Create a new key")
+        print(f"{len(keys)+1}. Create a new key")
 
         while True:
             try:
                 choice = int(input("Enter your choice: "))
                 if 1 <= choice <= len(keys):
-                    return [keys[choice-1]]
+                    return keys[choice-1]
                 elif choice == len(keys)+1:
-                    return keys
-                elif choice == len(keys)+2:
                     return "new"
                 print("Invalid choice. Please try again.")
             except ValueError:
@@ -236,8 +233,8 @@ class NginxRedirectSetup:
             ssh_key, self.ssh_key_path = self.create_new_ssh_key()
             ssh_keys = [ssh_key] if ssh_key else []
         else:
-            ssh_keys = ssh_key_choice
-            self.ssh_key_path = os.path.expanduser("~/.ssh/id_rsa")  # Default to id_rsa for existing keys
+            ssh_keys = [ssh_key_choice]
+            self.ssh_key_path = os.path.expanduser(f"~/.ssh/{ssh_key_choice.name}")
 
         user_data = f"""#!/bin/bash
     sudo ufw allow {start_port}:{start_port + num_redirects - 1}/tcp

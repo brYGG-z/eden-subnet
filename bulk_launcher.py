@@ -96,7 +96,7 @@ def register(module_filename, index, ipv4, reserved_ip, port, num_ports, Netuid,
         next_port = port + i
         ss58 = Ss58Address(module_name)
         print("Port: ", next_port)
-        print("Transfer Com to new miner key")
+        print(f"Transfer {str(stake)}COM to new miner key")
         try:
             value = subprocess.run(["comx", "balance", "transfer", key, str(stake), ss58], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(value.stdout)
@@ -113,7 +113,7 @@ def register(module_filename, index, ipv4, reserved_ip, port, num_ports, Netuid,
             logger.error(f"Error processing thing:\n{e}")        
         print(f"Registered {module_name} at {ip}:{next_port}")
         sleep(5)
-        print("Stake miner")
+        print("Staking miner...")
         try:
             value = subprocess.run(["comx", "balance", "stake", module_name, str(stake - 10.5), module_name], check=True)
         except subprocess.CalledProcessError as e:

@@ -368,8 +368,8 @@ transfer_and_stake_multiple() {
     echo "Initiating Balance Transfer"
     comx balance transfer "$key_from" "$amount" "$key_to"
     echo "Transfer of $amount from $key_from to $key_to completed."
-    mount_minus_half=$(echo "$amount - 0.5" | awk '{print $1 - 0.5}')
-    comx balance stake "$key_to" "$mount_minus_half" "$key_to"
+    amount_minus_half=$(echo "$amount - 0.5" | awk '{print $1 - 0.5}')
+    comx balance stake "$key_to" "$amount_minus_half" "$key_to"
     echo "$amount_minus_half COM staked from $key_to to $key_to"
         
     done
@@ -385,7 +385,7 @@ serve_miner() {
 # Function to register a miner
 register_miner() {
     echo "Registering Miner"
-    comx module register "$module_path" "$key_name" --netuid "$netuid" --stake "$stake" --ip "$host" --port "$port"
+    comx module register "$module_path" "$key_name" --netuid "$netuid" --ip "$host" --port "$port"
     echo "Miner registered."
 }
 
